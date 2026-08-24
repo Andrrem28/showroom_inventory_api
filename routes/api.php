@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────
@@ -28,4 +29,12 @@ use Illuminate\Support\Facades\Route;
     Route::post('roles/{id}/permissions', [RoleController::class, 'attachPermissions']);
     // Remove permissions específicas de um role
     Route::delete('roles/{id}/permissions', [RoleController::class, 'detachPermissions']);
+
+     // ── Users ─────────────────────────────────────────
+    Route::apiResource('users', UserController::class);
+
+    // Ligação User <-> Roles
+    Route::put('users/{id}/roles',    [UserController::class, 'syncRoles']);
+    Route::post('users/{id}/roles',   [UserController::class, 'attachRoles']);
+    Route::delete('users/{id}/roles', [UserController::class, 'detachRoles']);
 // });
