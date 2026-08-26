@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
@@ -43,4 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('permission:users.manage');
     Route::delete('users/{id}/roles', [UserController::class, 'detachRoles'])
         ->middleware('permission:users.manage');
+
+    // ── Categories ────────────────────────────────────
+    Route::apiResource('categories', CategoryController::class)
+        ->middleware('permission:categories.manage');
 });
