@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
@@ -48,4 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Categories ────────────────────────────────────
     Route::apiResource('categories', CategoryController::class)
         ->middleware('permission:categories.manage');
+
+    // ── Brands ────────────────────────────────────
+    Route::apiResource('brands', BrandController::class)
+    ->middleware('permission:categories.manage');
 });

@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Http\Requests\Brand;
+
+use App\DTOs\BrandDTO;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdateBrandRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('brands', 'name')->ignore($this->route('brand')),
+            ],
+        ];
+    }
+
+    public function toDTO(): BrandDTO
+    {
+        return BrandDTO::fromRequest($this->validated());
+    }
+}
