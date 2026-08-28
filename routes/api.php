@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────
@@ -53,4 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Brands ────────────────────────────────────
     Route::apiResource('brands', BrandController::class)
     ->middleware('permission:categories.manage');
+
+    Route::apiResource('suppliers', SupplierController::class)
+    ->middleware('permission:suppliers.manage');
 });
