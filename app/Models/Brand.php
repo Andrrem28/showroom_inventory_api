@@ -10,9 +10,8 @@ class Brand extends Model
         'name',
     ];
 
-    # Descomentar esta linha quando criar o módulo de produtos.
-    // public function products()
-    // {
-    //     return $this->hasMany(Product::class);
-    // }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
