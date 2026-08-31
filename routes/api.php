@@ -4,10 +4,11 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StorageLocationController;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SupplierController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────
@@ -19,14 +20,15 @@ Route::post('/login', [AuthController::class, 'login']);
 // ROTAS PROTEGIDAS
 // ─────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
+
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me',      [AuthController::class, 'me']);
 
-    // ── Permissions (apenas admin) ────────────────────
+    // ── Permissions ───────────────────────────────────
     Route::apiResource('permissions', PermissionController::class)
         ->middleware('permission:users.manage');
 
-    // ── Roles (apenas admin) ──────────────────────────
+    // ── Roles ─────────────────────────────────────────
     Route::apiResource('roles', RoleController::class)
         ->middleware('permission:users.manage');
 
@@ -37,28 +39,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('roles/{id}/permissions', [RoleController::class, 'detachPermissions'])
         ->middleware('permission:users.manage');
 
-    // ── Users (apenas admin) ──────────────────────────
+    // ── Users ─────────────────────────────────────────
     Route::apiResource('users', UserController::class)
         ->middleware('permission:users.manage');
 
-    Route::put('users/{id}/roles',    [UserController::class, 'syncRoles'])
+    Route::put('users/{user}/roles',    [UserController::class, 'syncRoles'])
         ->middleware('permission:users.manage');
-    Route::post('users/{id}/roles',   [UserController::class, 'attachRoles'])
+    Route::post('users/{user}/roles',   [UserController::class, 'attachRoles'])
         ->middleware('permission:users.manage');
-    Route::delete('users/{id}/roles', [UserController::class, 'detachRoles'])
+    Route::delete('users/{user}/roles', [UserController::class, 'detachRoles'])
         ->middleware('permission:users.manage');
 
     // ── Categories ────────────────────────────────────
     Route::apiResource('categories', CategoryController::class)
         ->middleware('permission:categories.manage');
 
-    // ── Brands ────────────────────────────────────
+    // ── Brands ────────────────────────────────────────
     Route::apiResource('brands', BrandController::class)
-    ->middleware('permission:categories.manage');
+        ->middleware('permission:categories.manage');
 
+    // ── Suppliers ─────────────────────────────────────
     Route::apiResource('suppliers', SupplierController::class)
-    ->middleware('permission:suppliers.manage');
+        ->middleware('permission:suppliers.manage');
 
+    // ── Storage Locations ─────────────────────────────
     Route::apiResource('storage-locations', StorageLocationController::class)
-    ->middleware('permission:categories.manage');
+        ->middleware('permission:storage-locations.manage');
+
+    // ── Products ──────────────────────────────────────
+    Route::get('products/low-stock', [ProductController::class, 'lowStock'])
+        ->middleware('permission:products.manage');
+
+    Route::apiResource('products', ProductController::class)
+        ->middleware('permission:products.manage');
+
 });
