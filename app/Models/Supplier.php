@@ -13,9 +13,8 @@ class Supplier extends Model
         'contact_person',
     ];
 
-    # Descomentar esta linha quando fizer a parte de produtos
-    // public function products()
-    // {
-    //     return $this->hasMany(Product::class);
-    // }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

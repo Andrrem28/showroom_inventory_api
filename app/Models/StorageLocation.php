@@ -11,9 +11,8 @@ class StorageLocation extends Model
         'description',
     ];
 
-    # Descomentar esta linha quando fizer a parte de produtos
-    // public function products()
-    // {
-    //     return $this->hasMany(Product::class, 'location_id');
-    // }
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'location_id');
+    }
 }

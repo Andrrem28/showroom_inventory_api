@@ -12,29 +12,44 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Cria as permissions
+        // ─────────────────────────────────────
+        // Permissões
+        // ─────────────────────────────────────
         $permissions = [
-            ['name' => 'products.view',   'description' => 'Visualizar produtos'],
-            ['name' => 'products.create', 'description' => 'Criar produtos'],
-            ['name' => 'products.edit',   'description' => 'Editar produtos'],
-            ['name' => 'products.delete', 'description' => 'Excluir produtos'],
-            ['name' => 'stock.view',      'description' => 'Visualizar movimentações de estoque'],
-            ['name' => 'stock.create',    'description' => 'Registrar entrada ou saída de estoque'],
-            ['name' => 'sales.view',      'description' => 'Visualizar vendas'],
-            ['name' => 'sales.create',    'description' => 'Registrar vendas'],
-            ['name' => 'sales.delete',    'description' => 'Cancelar ou excluir vendas'],
-            ['name' => 'suppliers.manage',  'description' => 'Gerenciar fornecedores'],
-            ['name' => 'categories.manage', 'description' => 'Gerenciar categorias e marcas'],
-            ['name' => 'clients.manage',    'description' => 'Gerenciar clientes'],
-            ['name' => 'users.manage',    'description' => 'Gerenciar usuários e papéis'],
-            ['name' => 'reports.view',    'description' => 'Acessar relatórios e dashboard'],
+            // Produtos
+            ['name' => 'products.manage',          'description' => 'Gerenciar produtos'],
+            ['name' => 'products.view',            'description' => 'Visualizar produtos'],
+            ['name' => 'products.create',          'description' => 'Criar produtos'],
+            ['name' => 'products.edit',            'description' => 'Editar produtos'],
+            ['name' => 'products.delete',          'description' => 'Excluir produtos'],
+
+            // Estoque
+            ['name' => 'stock.view',               'description' => 'Visualizar movimentações de estoque'],
+            ['name' => 'stock.create',             'description' => 'Registrar entrada ou saída de estoque'],
+
+            // Vendas
+            ['name' => 'sales.view',               'description' => 'Visualizar vendas'],
+            ['name' => 'sales.create',             'description' => 'Registrar vendas'],
+            ['name' => 'sales.delete',             'description' => 'Cancelar ou excluir vendas'],
+
+            // Cadastros auxiliares
+            ['name' => 'categories.manage',        'description' => 'Gerenciar categorias e marcas'],
+            ['name' => 'suppliers.manage',         'description' => 'Gerenciar fornecedores'],
+            ['name' => 'storage-locations.manage', 'description' => 'Gerenciar locais de armazenamento'],
+            ['name' => 'clients.manage',           'description' => 'Gerenciar clientes'],
+
+            // Administração
+            ['name' => 'users.manage',             'description' => 'Gerenciar usuários e papéis'],
+            ['name' => 'reports.view',             'description' => 'Acessar relatórios e dashboard'],
         ];
 
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm['name']], $perm);
         }
 
-        // Cria a role admin
+        // ─────────────────────────────────────
+        // Role Admin
+        // ─────────────────────────────────────
         $adminRole = Role::firstOrCreate(
             ['name' => 'admin'],
             ['description' => 'Acesso total ao sistema']
@@ -43,7 +58,9 @@ class AdminUserSeeder extends Seeder
         // Associa todas as permissions à role admin
         $adminRole->permissions()->sync(Permission::all());
 
-        // Cria o usuário administrador
+        // ─────────────────────────────────────
+        // Usuário Administrador
+        // ─────────────────────────────────────
         $user = User::firstOrCreate(
             ['email' => 'admin@salao.com'],
             [
@@ -53,7 +70,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Associa a role admin ao usuário
         $user->roles()->syncWithoutDetaching([$adminRole->id]);
     }
 }

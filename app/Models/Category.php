@@ -12,9 +12,8 @@ class Category extends Model
         'name',
         'description',
     ];
-    # Descomentar esta linha quando fizer a parte de produtos
-    // public function products()
-    // {
-    //     return $this->hasMany(Product::class);
-    // }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
