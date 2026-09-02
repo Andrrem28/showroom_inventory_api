@@ -26,11 +26,13 @@ class AdminUserSeeder extends Seeder
             // Estoque
             ['name' => 'stock.view',               'description' => 'Visualizar movimentações de estoque'],
             ['name' => 'stock.create',             'description' => 'Registrar entrada ou saída de estoque'],
+            ['name' => 'stock.manage',             'description' => 'Gerenciar movimentações de estoque'],
 
             // Vendas
             ['name' => 'sales.view',               'description' => 'Visualizar vendas'],
             ['name' => 'sales.create',             'description' => 'Registrar vendas'],
             ['name' => 'sales.delete',             'description' => 'Cancelar ou excluir vendas'],
+            ['name' => 'sales.manage',             'description' => 'Gerenciar vendas'],
 
             // Cadastros auxiliares
             ['name' => 'categories.manage',        'description' => 'Gerenciar categorias e marcas'],
