@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\StorageLocationController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\UserController;
@@ -72,5 +73,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('products', ProductController::class)
         ->middleware('permission:products.manage');
+
+    // ── Stock Movements ───────────────────────────────
+    Route::apiResource('stock-movements', StockMovementController::class)
+        ->only(['index', 'show', 'store'])
+        ->middleware('permission:stock.manage');
+
+    // Histórico por produto
+    Route::get('products/{product}/stock-movements', [StockMovementController::class, 'byProduct'])
+        ->middleware('permission:stock.manage');
 
 });
