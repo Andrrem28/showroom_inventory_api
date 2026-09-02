@@ -69,9 +69,8 @@ class Product extends Model
         return $this->belongsTo(StorageLocation::class, 'location_id');
     }
 
-    # Descomentar esta linha quando eu ficar a parte de Stock Movements
-    // public function stockMovements()
-    // {
-    //     return $this->hasMany(StockMovement::class);
-    // }
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
 }
