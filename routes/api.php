@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
@@ -83,4 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('products/{product}/stock-movements', [StockMovementController::class, 'byProduct'])
         ->middleware('permission:stock.manage');
 
+    // ── Clients ───────────────────────────────────────
+    Route::apiResource('clients', ClientController::class)
+    ->middleware('permission:clients.manage');
 });
