@@ -30,24 +30,19 @@ class SaleService
     private function calculateDiscount(int $totalQty, string $paymentMethod, int $installments): float
     {
         // Fiado nunca tem desconto
-        if ($paymentMethod === 'fiado') return 0;
+        // if ($paymentMethod === 'fiado') return 0;
 
-        // Crédito parcelado nunca tem desconto
-        if ($paymentMethod === 'cartao_credito' && $installments > 1) return 0;
-
-        // Pagamentos que dão desconto cheio: dinheiro, pix, débito e crédito à vista
-        $fullDiscountMethods = ['dinheiro', 'pix', 'cartao_debito'];
-        $isFullDiscount      = in_array($paymentMethod, $fullDiscountMethods)
-                            || ($paymentMethod === 'cartao_credito' && $installments === 1);
-
-        if ($totalQty >= 3) {
-            // Crédito à vista tem 20%, demais têm 25%
-            if ($paymentMethod === 'cartao_credito' && $installments === 1) return 20;
-            return $isFullDiscount ? 25 : 0;
+        // Crédito parcelado (2x+)
+        if ($paymentMethod === 'cartao_credito' && $installments > 1) {
+            return 10; // desconto fixo de 10% independente da quantidade
         }
 
-        // Até 2 unidades — 10% para todos os métodos elegíveis
-        return $isFullDiscount ? 10 : 0;
+        // Dinheiro, PIX, Débito e Crédito à vista
+        if ($totalQty >= 3) {
+            return $paymentMethod === 'cartao_credito' ? 20 : 25;
+        }
+
+        return 10;
     }
 
     public function create(SaleDTO $dto, int $userId): Sale
