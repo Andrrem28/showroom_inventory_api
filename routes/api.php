@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\StorageLocationController;
 use App\Http\Controllers\Api\SupplierController;
@@ -87,4 +88,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Clients ───────────────────────────────────────
     Route::apiResource('clients', ClientController::class)
     ->middleware('permission:clients.manage');
+
+    // ── Sales ─────────────────────────────────────────
+    Route::apiResource('sales', SaleController::class)
+        ->only(['index', 'show', 'store', 'destroy'])
+        ->middleware('permission:sales.manage');
+
 });
