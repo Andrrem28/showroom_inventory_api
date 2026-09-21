@@ -16,6 +16,8 @@ class SaleResource extends JsonResource
             'installment_value' => $this->installments > 1
                 ? number_format($this->installment_value, 2, ',', '.')
                 : null,
+            'discount_percent'  => number_format($this->discount_percent, 2, ',', '.'),
+            'discount_amount'   => number_format($this->discount_amount, 2, ',', '.'),
             'total_amount'      => number_format($this->total_amount, 2, ',', '.'),
             'notes'             => $this->notes,
             'sold_at'           => $this->sold_at->format('d/m/Y H:i'),
