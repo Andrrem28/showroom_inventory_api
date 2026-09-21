@@ -12,16 +12,21 @@ class Sale extends Model
         'payment_method',
         'installments',
         'installment_value',
+        'discount_percent',
+        'discount_amount',
         'total_amount',
         'sold_at',
         'notes',
     ];
+
 
     protected function casts(): array
     {
         return [
             'total_amount'      => 'decimal:2',
             'installment_value' => 'decimal:2',
+            'discount_percent'  => 'decimal:2',
+            'discount_amount'   => 'decimal:2',
             'installments'      => 'integer',
             'sold_at'           => 'datetime',
         ];
