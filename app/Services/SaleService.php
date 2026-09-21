@@ -24,17 +24,43 @@ class SaleService
             ->findOrFail($id);
     }
 
+    // ─────────────────────────────────────
+    // Calcula o percentual de desconto
+    // ─────────────────────────────────────
+    private function calculateDiscount(int $totalQty, string $paymentMethod, int $installments): float
+    {
+        // Fiado nunca tem desconto
+        if ($paymentMethod === 'fiado') return 0;
+
+        // Crédito parcelado nunca tem desconto
+        if ($paymentMethod === 'cartao_credito' && $installments > 1) return 0;
+
+        // Pagamentos que dão desconto cheio: dinheiro, pix, débito e crédito à vista
+        $fullDiscountMethods = ['dinheiro', 'pix', 'cartao_debito'];
+        $isFullDiscount      = in_array($paymentMethod, $fullDiscountMethods)
+                            || ($paymentMethod === 'cartao_credito' && $installments === 1);
+
+        if ($totalQty >= 3) {
+            // Crédito à vista tem 20%, demais têm 25%
+            if ($paymentMethod === 'cartao_credito' && $installments === 1) return 20;
+            return $isFullDiscount ? 25 : 0;
+        }
+
+        // Até 2 unidades — 10% para todos os métodos elegíveis
+        return $isFullDiscount ? 10 : 0;
+    }
+
     public function create(SaleDTO $dto, int $userId): Sale
     {
         return DB::transaction(function () use ($dto, $userId) {
             $totalAmount = 0;
+            $totalQty    = 0;
             $saleItems   = [];
 
             // Valida e prepara os itens
             foreach ($dto->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
 
-                // Verifica estoque disponível
                 if ($product->current_stock < $item['quantity']) {
                     throw new \Exception(
                         "Estoque insuficiente para o produto \"{$product->name}\". " .
@@ -45,6 +71,7 @@ class SaleService
                 $unitPrice    = (float) $product->sale_price;
                 $subtotal     = $unitPrice * $item['quantity'];
                 $totalAmount += $subtotal;
+                $totalQty    += $item['quantity'];
 
                 $saleItems[] = [
                     'product'   => $product,
@@ -54,11 +81,16 @@ class SaleService
                 ];
             }
 
-            // Calcula o valor da parcela
-            $installments     = $dto->installments ?? 1;
+            // Calcula desconto
+            $installments      = $dto->installments ?? 1;
+            $discountPercent   = $this->calculateDiscount($totalQty, $dto->payment_method, $installments);
+            $discountAmount    = round($totalAmount * ($discountPercent / 100), 2);
+            $totalWithDiscount = $totalAmount - $discountAmount;
+
+            // Calcula parcela
             $installmentValue = $installments > 1
-                ? round($totalAmount / $installments, 2)
-                : $totalAmount;
+                ? round($totalWithDiscount / $installments, 2)
+                : $totalWithDiscount;
 
             // Cria a venda
             $sale = Sale::create([
@@ -67,12 +99,14 @@ class SaleService
                 'payment_method'    => $dto->payment_method,
                 'installments'      => $installments,
                 'installment_value' => $installmentValue,
-                'total_amount'      => $totalAmount,
+                'discount_percent'  => $discountPercent,
+                'discount_amount'   => $discountAmount,
+                'total_amount'      => $totalWithDiscount,
                 'sold_at'           => $dto->sold_at ?? now(),
                 'notes'             => $dto->notes,
             ]);
 
-            // Cria os itens, desconta o estoque e registra a movimentação
+            // Cria os itens, desconta estoque e registra movimentação
             foreach ($saleItems as $item) {
                 $sale->items()->create([
                     'product_id' => $item['product']->id,
@@ -81,10 +115,8 @@ class SaleService
                     'subtotal'   => $item['subtotal'],
                 ]);
 
-                // Desconta o estoque
                 $item['product']->decrement('current_stock', $item['quantity']);
 
-                // Registra saída automática em stock_movements
                 StockMovement::create([
                     'product_id' => $item['product']->id,
                     'user_id'    => $userId,
@@ -103,11 +135,8 @@ class SaleService
     {
         DB::transaction(function () use ($sale) {
             foreach ($sale->items as $item) {
-
-                // Devolve o estoque
                 $item->product->increment('current_stock', $item->quantity);
 
-                // Registra entrada de estorno em stock_movements
                 StockMovement::create([
                     'product_id' => $item->product->id,
                     'user_id'    => $sale->user_id,
